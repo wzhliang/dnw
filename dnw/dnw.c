@@ -63,6 +63,9 @@ int main(int argc, char* argv[])
 		sum += file_buffer[i];
 	}
 	
+    file_buffer [file_stat.st_size + 8] = sum & 0xff;
+    file_buffer [file_stat.st_size + 9] = sum >> 8;
+
 	printf("Writing data...\n");
 	size_t remain_size = file_stat.st_size+10;
 	size_t block_size = remain_size / 100;
