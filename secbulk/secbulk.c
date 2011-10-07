@@ -23,7 +23,7 @@ struct secbulk_dev
 static struct usb_class_driver secbulk_class;
 
 static struct usb_device_id secbulk_table[]= {
-	{ USB_DEVICE(0x5345, 0x1234)},
+	{ USB_DEVICE(0x04e8, 0x1234)},
 	{ }
 };
 
@@ -84,16 +84,26 @@ static int secbulk_open(struct inode *node, struct file *file)
 	struct usb_interface *interface;
 	struct secbulk_dev *dev;
 	
+	printk(KERN_ERR "secbulk:opening device.!\n");
 	interface = usb_find_interface(&secbulk_driver, iminor(node));
 	if(!interface)
+	{
+		printk(KERN_ERR "secbulk:unable to register interface!\n");
 		return -ENODEV;
+	}
 
 	dev = usb_get_intfdata(interface);
 	dev->bulkout_buffer = kzalloc(BULKOUT_BUFFER_SIZE, GFP_KERNEL);
 	if(!(dev->bulkout_buffer))
+	{
+		printk(KERN_ERR "kzalloc failed!\n");
 		return -ENOMEM;
+	}
 	if(!mutex_trylock(&dev->io_mutex))
+	{
+		printk(KERN_ERR "device busy!\n");
 		return -EBUSY;
+	}
 	file->private_data = dev;
 	return 0;
 }
